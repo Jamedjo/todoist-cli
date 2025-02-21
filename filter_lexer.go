@@ -319,6 +319,12 @@ func (l *Lexer) Lex(lval *yySymType) int {
 		} else {
 			token = STRING
 		}
+
+		if l.last == '/' {
+			token = STRING
+		} else if l.last == '#' {
+			token = STRING
+		}
 	case int('@'):
 		if l.IsInString() {
 			token = STRING

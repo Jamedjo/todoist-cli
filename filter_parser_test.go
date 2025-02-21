@@ -93,6 +93,13 @@ func TestProjectFilter(t *testing.T) {
 			name:  "base\\s?.*",
 		}},
 		Filter("#base*"), "they should be equal")
+
+	assert.Equal(t,
+		[]Expression{ProjectExpr{
+			isAll: false,
+			name:  "Today",
+		}},
+		Filter("#Today"), "they should be equal")
 }
 
 func TestLabelFilter(t *testing.T) {
@@ -520,6 +527,14 @@ func TestSections(t *testing.T) {
 			SectionExpr{section: "Meetings"},
 		},
 		Filter("/Meetings"),
+	)
+
+	assert.Equal(
+		t,
+		[]Expression{
+			SectionExpr{section: "Today"},
+		},
+		Filter("/Today"),
 	)
 
 	assert.Equal(
