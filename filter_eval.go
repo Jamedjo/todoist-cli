@@ -60,6 +60,9 @@ func Eval(e Expression, item todoist.AbstractItem, store *todoist.Store) (result
 	case ProjectExpr:
 		e := e.(ProjectExpr)
 		return EvalProject(e, item.GetProjectID(), store.Projects), err
+	case SectionExpr:
+		e := e.(SectionExpr)
+		return EvalSection(e, item.GetSectionID(), store.Sections), err
 	case LabelExpr:
 		e := e.(LabelExpr)
 		return EvalLabel(e, item.GetLabelNames()), err
@@ -186,6 +189,15 @@ func EvalAsPriority(e StringExpr, item *todoist.Item) (result bool) {
 func EvalProject(e ProjectExpr, projectID string, projects todoist.Projects) bool {
 	for _, id := range projects.GetIDsByName(e.name, e.isAll) {
 		if id == projectID {
+			return true
+		}
+	}
+	return false
+}
+
+func EvalSection(e SectionExpr, sectionID string, sections todoist.Sections) bool {
+	for _, id := range sections.GetIDsByName(e.section) {
+		if id == sectionID {
 			return true
 		}
 	}

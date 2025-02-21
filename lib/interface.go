@@ -81,3 +81,8 @@ func (carrier HaveIndent) GetIndent() int {
 func (carrier HaveProjectID) GetProjectID() string {
 	return carrier.ProjectID
 }
+
+func (carrier HaveSectionID) GetSectionID() string {
+	return carrier.SectionID
+}
+

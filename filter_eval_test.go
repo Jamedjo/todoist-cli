@@ -34,6 +34,12 @@ func testFilterEvalWithProject(t *testing.T, f string, item todoist.Item, projec
 	assert.Equal(t, expect, actual, "they should be equal")
 }
 
+func testFilterEvalWithProjectSections(t *testing.T, f string, item todoist.Item, projects todoist.Projects, sections todoist.Sections, expect bool) {
+	actual, _ := Eval(Filter(f)[0], &item, &todoist.Store{Projects: projects, Sections: sections})
+	assert.Equal(t, expect, actual, "they should be equal")
+}
+
+
 func testFilterEvalWithCollaborators(t *testing.T, f string, item todoist.Item, user todoist.User, collaborators todoist.Collaborators, expect bool) {
 	actual, _ := Eval(Filter(f)[0], &item, &todoist.Store{User: user, Collaborators: collaborators})
 	assert.Equal(t, expect, actual, "they should be equal")
@@ -95,6 +101,10 @@ func TestProjectEval(t *testing.T) {
 			HaveID: todoist.HaveID{ID: "3"},
 			Name:   "Work",
 		},
+		todoist.Project{
+			HaveID: todoist.HaveID{ID: "4"},
+			Name:   "with space",
+		},
 	}
 
 	item1 := todoist.Item{}
@@ -105,11 +115,37 @@ func TestProjectEval(t *testing.T) {
 
 	item3 := todoist.Item{}
 	item3.ProjectID = "3"
+
+	item4 := todoist.Item{}
+	item4.ProjectID = "4"
+
 	testFilterEvalWithProject(t, "#private", item1, projects, true)
 	testFilterEvalWithProject(t, "#hoge", item1, projects, false)
 	testFilterEvalWithProject(t, "#private", item2, projects, false)
 	testFilterEvalWithProject(t, "##private", item2, projects, true)
 	testFilterEvalWithProject(t, "#Work", item3, projects, true)
+	testFilterEvalWithProject(t, "#with\\ space", item4, projects, true)
+
+	section1 := todoist.Section{
+		Name: "Meetings",
+		HaveID: todoist.HaveID{ID: "9"},
+		HaveProjectID: todoist.HaveProjectID{ProjectID: "3"},
+	}
+	sections := todoist.Sections{
+		section1,
+	}
+	item5 := todoist.Item{
+		BaseItem: todoist.BaseItem{
+			HaveProjectID: todoist.HaveProjectID{ProjectID: "3"},
+			HaveSectionID: todoist.HaveSectionID{SectionID: "9"},
+		},
+	}
+	testFilterEvalWithProjectSections(t, "/Meetings", item5, projects, sections, true)
+	testFilterEvalWithProjectSections(t, "/Meetings", item3, projects, sections, false)
+	testFilterEvalWithProjectSections(t, "#Work & /Meetings", item5, projects, sections, true)
+	testFilterEvalWithProjectSections(t, "#Work & /Meetings", item3, projects, sections, false)
+	testFilterEvalWithProjectSections(t, "#Work/Meetings", item5, projects, sections, true)
+	testFilterEvalWithProjectSections(t, "#Work/Meetings", item3, projects, sections, true)
 }
 
 func TestBoolInfixOpExp(t *testing.T) {
