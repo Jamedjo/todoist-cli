@@ -85,6 +85,9 @@ type BoolInfixOpExpr struct {
 type ProjectExpr struct {
 	isAll   bool
 	name    string
+}
+
+type SectionExpr struct {
 	section string
 }
 

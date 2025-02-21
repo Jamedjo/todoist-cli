@@ -78,7 +78,7 @@ expr
     }
     | '/' s_string
     {
-        $$ = ProjectExpr{isAll: false, section: $2.(StringExpr).String()}
+        $$ = SectionExpr{section: $2.(StringExpr).String()}
     }
     | s_project_key s_string
     {
@@ -88,7 +88,9 @@ expr
     {
         name := $2.(StringExpr).String()
         section := $4.(StringExpr).String()
-        $$ = ProjectExpr{isAll: false, name: name, section: section}
+        left := ProjectExpr{isAll: false, name: name}
+        right := SectionExpr{section: section}
+        $$ = BoolInfixOpExpr{left: left, operator: '|', right: right}
     }
     | s_project_all_key s_string
     {

@@ -517,7 +517,7 @@ func TestSections(t *testing.T) {
 	assert.Equal(
 		t,
 		[]Expression{
-			ProjectExpr{section: "Meetings"},
+			SectionExpr{section: "Meetings"},
 		},
 		Filter("/Meetings"),
 	)
@@ -525,7 +525,11 @@ func TestSections(t *testing.T) {
 	assert.Equal(
 		t,
 		[]Expression{
-			ProjectExpr{name: "Work", section: "Meetings"},
+			BoolInfixOpExpr{
+				left:     ProjectExpr{name: "Work"},
+				operator: '|',
+				right:    SectionExpr{section: "Meetings"},
+			},
 		},
 		Filter("#Work/Meetings"),
 	)
@@ -536,7 +540,7 @@ func TestSections(t *testing.T) {
 			BoolInfixOpExpr{
 				left:     ProjectExpr{name: "Work"},
 				operator: '&',
-				right:    ProjectExpr{section: "Meetings"},
+				right:    SectionExpr{section: "Meetings"},
 			},
 		},
 		Filter("#Work & /Meetings"),
@@ -545,7 +549,7 @@ func TestSections(t *testing.T) {
 	assert.Equal(
 		t,
 		[]Expression{
-			NotOpExpr{expr: ProjectExpr{section: ".*"}},
+			NotOpExpr{expr: SectionExpr{section: ".*"}},
 		},
 		Filter("!/*"),
 	)
@@ -554,7 +558,7 @@ func TestSections(t *testing.T) {
 		t,
 		[]Expression{
 			BoolInfixOpExpr{
-				left:     NotOpExpr{expr: ProjectExpr{section: ".*"}},
+				left:     NotOpExpr{expr: SectionExpr{section: ".*"}},
 				operator: '&',
 				right:    NotOpExpr{expr: ProjectExpr{name: "Inbox"}},
 			},
