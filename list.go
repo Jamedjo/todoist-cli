@@ -9,16 +9,27 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func traverseItems(item *todoist.Item, f func(item *todoist.Item, depth int), depth int) {
-	f(item, depth)
+func traverseItems(item *todoist.Item, f func(item *todoist.Item, depth int) error, depth int) error {
+	err := f(item, depth)
+	if err != nil {
+		return err
+	}
 
 	if item.ChildItem != nil {
-		traverseItems(item.ChildItem, f, depth+1)
+		err := traverseItems(item.ChildItem, f, depth+1)
+		if err != nil {
+			return err
+		}
 	}
 
 	if item.BrotherItem != nil {
-		traverseItems(item.BrotherItem, f, depth)
+		err := traverseItems(item.BrotherItem, f, depth)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 func sortItems(itemListPtr *[][]string, byIndex int) {
@@ -55,13 +66,13 @@ func List(c *cli.Context) error {
 
 	for _, ex := range Filter(c.String("filter")) {
 		itemList := [][]string{}
-		traverseItems(rootItem, func(item *todoist.Item, depth int) {
+		err := traverseItems(rootItem, func(item *todoist.Item, depth int) error {
 			r, err := Eval(ex, item, client.Store)
 			if err != nil {
-				return
+				return err
 			}
 			if !r || item.Checked {
-				return
+				return nil
 			}
 			itemList = append(itemList, []string{
 				IdFormat(item),
@@ -72,7 +83,12 @@ func List(c *cli.Context) error {
 				item.LabelsString(client.Store),
 				ContentPrefix(client.Store, item, depth, c) + ContentFormat(item),
 			})
+
+			return nil
 		}, 0)
+		if err != nil {
+			return err
+		}
 
 		if c.Bool("priority") == true {
 			// sort output by priority

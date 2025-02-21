@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -87,6 +89,9 @@ func Eval(e Expression, item todoist.AbstractItem, store *todoist.Store) (result
 		return !r, nil
 	case ViewAllExpr:
 		return true, nil
+	case ErrorExpr:
+		err := errors.New(fmt.Sprintf("Filter failed %s \nFor proper filter syntax see https://www.todoist.com/help/articles/introduction-to-filters-V98wIH", e))
+		return false, err
 	default:
 		return true, err
 	}
