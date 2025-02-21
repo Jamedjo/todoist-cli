@@ -224,6 +224,10 @@ s_string
     {
         $$ = $1.(StringExpr).Add(NewStringExpr($2.literal))
     }
+    | s_string '\\' STRING
+    {
+        $$ = $1.(StringExpr).Add(NewStringExpr($3.literal))
+    }
     | s_string '*' 
     {
         $$ = $1.(StringExpr).Add(NewStringExpr(".*"))

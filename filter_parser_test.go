@@ -34,6 +34,13 @@ func TestProjectFilter(t *testing.T) {
 	assert.Equal(t,
 		[]Expression{ProjectExpr{
 			isAll: false,
+			name:  `Work\s?work`,
+		}},
+		Filter("#Work\\ work"), "they should be equal")
+
+	assert.Equal(t,
+		[]Expression{ProjectExpr{
+			isAll: false,
 			name:  `Work\s?work\s?work`,
 		}},
 		Filter("#Work work work"), "they should be equal")
